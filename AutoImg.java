@@ -206,12 +206,19 @@ public class AutoImg extends BufferedImage
 		int innerXOrig = origX + innerW;
 		int innerYOrig = origY + innerH;
 
+    //TODO fix centering
 		drawRectOutline(innerXOrig, innerXOrig, outerW - innerW, outerH - innerH, clr);
+
+    stackFill(origX + 1, origY + 2, clr);
 
 		Point innerOrig = new Point(innerXOrig, innerYOrig);
 
 		return innerOrig;
 	}
 
+  Point drawHollowRect(int origX, int origY, int outerW, int outerH, int innerW, int innerH, Color clr)
+  {
+    return drawHollowRect(origX, origY, outerW, outerH, innerW, innerH, clr.getRGB());
+  }
 
 }

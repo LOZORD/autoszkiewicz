@@ -18,11 +18,11 @@ class Test2
 
 		//then draw a square
 
-		myImg.drawRect(dim/4, dim/4, dim/2, dim/2, Color.blue);
+		myImg.drawRect(dim/4, dim/4, dim/2, dim/2, Color.white);
 
 		//myImg.write("test2.bmp", "bmp");
 
-		myImg.write("blue_and_red.bmp");
+		myImg.write("white_and_red.bmp");
 
 		System.out.println("Written!");
 	}

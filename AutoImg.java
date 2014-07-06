@@ -4,6 +4,8 @@ import java.awt.image.*;
 import java.awt.geom.Point2D;
 import java.awt.Point;
 import java.io.*;
+import java.util.LinkedList;
+
 import javax.imageio.*;
 
 public class AutoImg extends BufferedImage
@@ -69,7 +71,7 @@ public class AutoImg extends BufferedImage
 
 	}
 
-	void drawRectOutline(int origX, int origY, int height, int width, int clr)
+	void drawRectOutline(int origX, int origY, int width, int height, int clr)
 	{
 		try
 		{
@@ -98,7 +100,7 @@ public class AutoImg extends BufferedImage
 		if 	(
 				x < 0 || x >= this.getWidth() ||
 				y < 0 || y >= this.getHeight()
-			)
+				)
 		{
 			return;
 		}
@@ -138,40 +140,77 @@ public class AutoImg extends BufferedImage
 		}
 	}
 
-//Attempted optimization of safeFill
-//	void riskyFill(int x, int y, int w, int h, int clr)
-//	{
-//		for (int i = x + 1; i < w; i++)
-//		{
-//			for (int j = y + 1; true; j++)
-//			{
-//				if (get(i,j) == clr) break;
-//				else set(i,j,clr);
-//			}
-//		}
-//	}
+	//seems to be the best implementation
+	void stackFill(int x, int y, int clr)
+	{
+		LinkedList<Point> stack = new LinkedList<Point>();
+
+		stack.push(new Point(x,y));
+
+		Point pixel = null;
+
+		while(!stack.isEmpty())
+		{
+			pixel = stack.pop();
+
+			if (inBounds(pixel) && get(pixel.x, pixel.y) != clr)
+			{
+				//set this pixel
+				set(pixel.x, pixel.y, clr);
+
+				//then push its neighbors
+				stack.push(new Point(pixel.x + 1, pixel.y));
+				stack.push(new Point(pixel.x - 1, pixel.y));
+				stack.push(new Point(pixel.x, pixel.y + 1));
+				stack.push(new Point(pixel.x, pixel.y - 1));
+
+			}
+		}
+	}
+
+	boolean inBounds (Point p)
+	{
+		return inBounds(p.x, p.y);
+	}
+
+	boolean inBounds (int x, int y)
+	{
+		boolean xGood = x >= 0 && x < this.getWidth();
+
+		boolean yGood = y >= 0 && y < this.getHeight();
+
+		return xGood && yGood;
+	}
 
 	void drawRect(int origX, int origY, int width, int height, int clr)
 	{
-		drawRectOutline(origX, origY, height, width, clr);
+		drawRectOutline(origX, origY, width, height, clr);
 
-		//floodFill(origX + 1, origY + 1, clr);
-
-		safeFill(origX, origY, height, width, clr);
-
-		//riskyFill(origX, origY, width, height, clr);
+		stackFill(origX + 1, origY + 2, clr);
 	}
 
 	void drawRect(int origX, int origY, int width, int height, Color clr)
 	{
-		drawRect(origX, origY, height, width, clr.getRGB());
+		drawRect(origX, origY, width, height, clr.getRGB());
 	}
 
 	//draws a hollow rectangle and returns the (x,y) point of the NW corner of the inner rect
-	Point drawHollowRect(int origX, int origY, int outerW, int outerH, int innerW, int innerH)
+	Point drawHollowRect(int origX, int origY, int outerW, int outerH, int innerW, int innerH, int clr)
 	{
-		//TODO
-		return new Point(0,0);
+		//a hollow rectangle is made up of two rectangular outlines
+
+		//first draw the outer rectangle
+		drawRectOutline(origX, origY, outerW, outerH, clr);
+
+		//now find the origin for the inner rect
+		int innerXOrig = origX + innerW;
+		int innerYOrig = origY + innerH;
+
+		drawRectOutline(innerXOrig, innerXOrig, outerW - innerW, outerH - innerH, clr);
+
+		Point innerOrig = new Point(innerXOrig, innerYOrig);
+
+		return innerOrig;
 	}
 
 

@@ -17,9 +17,19 @@ public class AutoImg extends BufferedImage
     super(w, h, BufferedImage.TYPE_INT_RGB);
   }
 
-  void set (int x, int y, Color clr)
+  void set(int x, int y, Color clr)
   {
     set(x, y, clr.getRGB());
+  }
+
+  void set(Point p, Color clr)
+  {
+    set(p, clr.getRGB());
+  }
+
+  void set(Point p, int clr)
+  {
+    set(p.x, p.y, clr);
   }
 
   void set(int x, int y, int clr)
@@ -30,6 +40,11 @@ public class AutoImg extends BufferedImage
   int get(int x, int y)
   {
     return getRGB(x, y);
+  }
+
+  int get(Point p)
+  {
+    return get(p.x, p.y);
   }
 
   Color getColor(int x, int y)
@@ -71,6 +86,11 @@ public class AutoImg extends BufferedImage
 
   }
 
+  void writeBMP(String fileName)
+  {
+    write(fileName, "bmp");
+  }
+
   void drawRectOutline(int origX, int origY, int width, int height, int clr)
   {
     try
@@ -94,6 +114,19 @@ public class AutoImg extends BufferedImage
       System.err.println("Attempted to draw rectangle out of image's bounds!");
       System.exit(1);
     }
+  }
+
+  void drawRectOutline(Point p, int w, int h, int clr)
+  {
+    drawRectOutline(p.x, p.y, w, h, clr);
+  }
+
+  void drawRectOutline(Point a, Point b, int clr)
+  {
+    int w = b.x - a.x;
+    int y = b.y - a.y;
+
+    drawRectOutline(a.x, a.y, w, h, clr);
   }
 
   void stackFill(int x, int y, int clr)
@@ -121,6 +154,22 @@ public class AutoImg extends BufferedImage
 
       }
     }
+  }
+
+  void stackFill(Point p, int clr)
+  {
+    stackFill(p.x, p.y, clr);
+  }
+
+  void fill(Point p, int clr)
+  {
+    //TODO add a function param so we can do different fills
+    stackFill(p, clr);
+  }
+
+  void fill(Point p, Color clr)
+  {
+    fill(p, clr.getRGB());
   }
 
   boolean inBounds (Point p)
@@ -151,6 +200,16 @@ public class AutoImg extends BufferedImage
     return drawRect(origX, origY, width, height, clr.getRGB());
   }
 
+  Point drawRect(Point a, Point b, int clr)
+  {
+    return drawRect(a.x, a.y, (b.x - a.x), (b.y - a.y), clr);
+  }
+
+  Point drawRect(Point a, Point b, Color c)
+  {
+    return drawRect(a, b, c.getRBG());
+  }
+
   //draws a hollow rectangle and returns the (x,y) point of the NW corner of the inner rect
   Point drawHollowRect(int origX, int origY, int outerW, int outerH, int innerW, int innerH, int clr)
   {
@@ -165,11 +224,11 @@ public class AutoImg extends BufferedImage
 
     int iPy = innerPoint.y;
 
+    //then draw the inner border
     drawRectOutline(iPx, iPy, innerW, innerH, clr);
 
+    //finally, fill in the difference
     stackFill(origX + 1, origY + 2, clr);
-
-    //Point innerOrig = new Point(innerXOrig, innerYOrig);
 
     return innerPoint;
   }
@@ -177,6 +236,21 @@ public class AutoImg extends BufferedImage
   Point drawHollowRect(int origX, int origY, int outerW, int outerH, int innerW, int innerH, Color clr)
   {
     return drawHollowRect(origX, origY, outerW, outerH, innerW, innerH, clr.getRGB());
+  }
+
+  Point drawHollowRect(Point oA, Point oB, Point iA, Point oB, int clr)
+  {
+    int outerW = oB.x - oA.x;
+    int outerH = oB.y - oA.y;
+    int innerW = iB.x - iB.x;
+    int innerH = iB.y - iB.y;
+
+    return drawHollowRect(oA.x, oA.y, outerW, outerH, innerW, innerH, clr);
+  }
+
+  Point drawHollowRect(Point oA, Point oB, Point iA, Point iB, Color clr)
+  {
+    return drawHollowRect(oA, oB, iA, iB, clr.getRBG());
   }
 
   //gets the NW point of an inner rectangle concentric to an outer rectangle

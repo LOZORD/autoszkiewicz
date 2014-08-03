@@ -124,7 +124,7 @@ public class AutoImg extends BufferedImage
   void drawRectOutline(Point a, Point b, int clr)
   {
     int w = b.x - a.x;
-    int y = b.y - a.y;
+    int h = b.y - a.y;
 
     drawRectOutline(a.x, a.y, w, h, clr);
   }
@@ -207,7 +207,7 @@ public class AutoImg extends BufferedImage
 
   Point drawRect(Point a, Point b, Color c)
   {
-    return drawRect(a, b, c.getRBG());
+    return drawRect(a, b, c.getRGB());
   }
 
   //draws a hollow rectangle and returns the (x,y) point of the NW corner of the inner rect
@@ -238,7 +238,7 @@ public class AutoImg extends BufferedImage
     return drawHollowRect(origX, origY, outerW, outerH, innerW, innerH, clr.getRGB());
   }
 
-  Point drawHollowRect(Point oA, Point oB, Point iA, Point oB, int clr)
+  Point drawHollowRect(Point oA, Point oB, Point iA, Point iB, int clr)
   {
     int outerW = oB.x - oA.x;
     int outerH = oB.y - oA.y;
@@ -250,7 +250,7 @@ public class AutoImg extends BufferedImage
 
   Point drawHollowRect(Point oA, Point oB, Point iA, Point iB, Color clr)
   {
-    return drawHollowRect(oA, oB, iA, iB, clr.getRBG());
+    return drawHollowRect(oA, oB, iA, iB, clr.getRGB());
   }
 
   //gets the NW point of an inner rectangle concentric to an outer rectangle

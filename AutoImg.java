@@ -210,6 +210,17 @@ public class AutoImg extends BufferedImage
     return drawRect(a, b, c.getRGB());
   }
 
+  void safeFill(int x, int y, int w, int h, int clr)
+  {
+    for (int i = x; i < x + w; i++)
+    {
+      for (int j = y; j < y + h; j++)
+      {
+        set(i, j, clr);
+      }
+    }
+  }
+
   //draws a hollow rectangle and returns the (x,y) point of the NW corner of the inner rect
   Point drawHollowRect(int origX, int origY, int outerW, int outerH, int innerW, int innerH, int clr)
   {
@@ -236,6 +247,16 @@ public class AutoImg extends BufferedImage
   Point drawHollowRect(int origX, int origY, int outerW, int outerH, int innerW, int innerH, Color clr)
   {
     return drawHollowRect(origX, origY, outerW, outerH, innerW, innerH, clr.getRGB());
+  }
+
+  Point drawHollowRect(Point oA, Point oB, int thickness, int clr)
+  {
+    return drawHollowRect(oA.x, oA.y, (oB.x - oA.x), (oB.y - oA.y), thickness, thickness, clr);
+  }
+
+  Point drawHollowRect(Point oA, Point oB, int thickness, Color clr)
+  {
+    return drawHollowRect(oA, oB, thickness, clr.getRGB());
   }
 
   Point drawHollowRect(Point oA, Point oB, Point iA, Point iB, int clr)

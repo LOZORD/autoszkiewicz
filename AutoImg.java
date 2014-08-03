@@ -11,214 +11,182 @@ import javax.imageio.*;
 public class AutoImg extends BufferedImage
 {
 
-	//for now, only allow RGB images
-	AutoImg(int w, int h)
-	{
-		super(w, h, BufferedImage.TYPE_INT_RGB);
-	}
+  //for now, only allow RGB images
+  AutoImg(int w, int h)
+  {
+    super(w, h, BufferedImage.TYPE_INT_RGB);
+  }
 
-	void set (int x, int y, Color clr)
-	{
-		set(x, y, clr.getRGB());
-	}
+  void set (int x, int y, Color clr)
+  {
+    set(x, y, clr.getRGB());
+  }
 
-	void set(int x, int y, int clr)
-	{
-		setRGB(x, y, clr);
-	}
+  void set(int x, int y, int clr)
+  {
+    setRGB(x, y, clr);
+  }
 
-	int get(int x, int y)
-	{
-		return getRGB(x, y);
-	}
+  int get(int x, int y)
+  {
+    return getRGB(x, y);
+  }
 
-	Color getColor(int x, int y)
-	{
-		int someRGB = get(x,y);
+  Color getColor(int x, int y)
+  {
+    int someRGB = get(x,y);
 
-		return new Color(someRGB);
-	}
+    return new Color(someRGB);
+  }
 
-	void write(String fileName, String fileType)
-	{
-		try
-		{
-			File outputFile = new File (fileName);
-			ImageIO.write(this, fileType, outputFile);
-			System.out.println("Successfully wrote image to file " + fileName);
-		}
-		catch (IOException e)
-		{
-			System.err.println("Could not write image to file " + fileName);
-			System.err.println(e.toString());
-			System.exit(1);
-		}
-	}
+  void write(String fileName, String fileType)
+  {
+    try
+    {
+      File outputFile = new File (fileName);
+      ImageIO.write(this, fileType, outputFile);
+      System.out.println("Successfully wrote image to file " + fileName);
+    }
+    catch (IOException e)
+    {
+      System.err.println("Could not write image to file " + fileName);
+      System.err.println(e.toString());
+      System.exit(1);
+    }
+  }
 
-	void write()
-	{
-		write("test_img.bmp", "bmp");
-	}
+  void write()
+  {
+    write("test_img.bmp", "bmp");
+  }
 
-	void write(String fileName)
-	{
-		int suffixStart = fileName.lastIndexOf('.');
+  void write(String fileName)
+  {
+    int suffixStart = fileName.lastIndexOf('.');
 
-		//start one character after the dot
-		String fileType = fileName.substring(suffixStart + 1);
+    //start one character after the dot
+    String fileType = fileName.substring(suffixStart + 1);
 
-		write(fileName, fileType);
+    write(fileName, fileType);
 
-	}
+  }
 
-	void drawRectOutline(int origX, int origY, int width, int height, int clr)
-	{
-		try
-		{
-			for (int i = 0; i <= width; i++)
-			{
-				set(origX + i, origY, clr);
-				set(origX + i, origY + height, clr);
-			}
+  void drawRectOutline(int origX, int origY, int width, int height, int clr)
+  {
+    try
+    {
+      //draw two horizontal lines
+      for (int i = 0; i <= width; i++)
+      {
+        set(origX + i, origY, clr);
+        set(origX + i, origY + height, clr);
+      }
 
-			for (int j = 0; j <= height; j++)
-			{
-				set(origX, origY + j, clr);
-				set(origX + width, origY + j, clr);
-			}
-		}
-		catch (ArrayIndexOutOfBoundsException e)
-		{
-			System.err.println("Attempted to draw rectangle out of image's bounds!");
-			System.exit(1);
-		}
-	}
+      //then, two vertical lines
+      for (int j = 0; j <= height; j++)
+      {
+        set(origX, origY + j, clr);
+        set(origX + width, origY + j, clr);
+      }
+    }
+    catch (ArrayIndexOutOfBoundsException e)
+    {
+      System.err.println("Attempted to draw rectangle out of image's bounds!");
+      System.exit(1);
+    }
+  }
 
-	//FIXME --> causes stackoverflows at larger img sizes
-	void floodFill(int x, int y, int clr)
-	{
-		if 	(
-				x < 0 || x >= this.getWidth() ||
-				y < 0 || y >= this.getHeight()
-				)
-		{
-			return;
-		}
+  void stackFill(int x, int y, int clr)
+  {
+    LinkedList<Point> stack = new LinkedList<Point>();
 
-		else if (this.get(x, y) == clr)
-		{
-			return;
-		}
+    stack.push(new Point(x,y));
 
-		//otherwise, recursively flood
-		else
-		{
+    Point pixel = null;
 
-			set(x,y, clr);
+    while(!stack.isEmpty())
+    {
+      pixel = stack.pop();
 
-			floodFill(x + 1, y, clr);
+      if (inBounds(pixel) && get(pixel.x, pixel.y) != clr)
+      {
+        //set this pixel
+        set(pixel.x, pixel.y, clr);
 
-			floodFill(x - 1, y, clr);
+        //then push its neighbors
+        stack.push(new Point(pixel.x + 1, pixel.y));
+        stack.push(new Point(pixel.x - 1, pixel.y));
+        stack.push(new Point(pixel.x, pixel.y + 1));
+        stack.push(new Point(pixel.x, pixel.y - 1));
 
-			floodFill(x, y + 1, clr);
+      }
+    }
+  }
 
-			floodFill(x, y - 1, clr);
+  boolean inBounds (Point p)
+  {
+    return inBounds(p.x, p.y);
+  }
 
-			return;
-		}
-	}
+  boolean inBounds (int x, int y)
+  {
+    boolean xGood = x >= 0 && x < this.getWidth();
 
-	//because at large sizes, floodFill was causing StackOverflows
-	void safeFill(int x, int y, int w, int h, int clr)
-	{
-		for (int i = x; i < x + w; i++)
-		{
-			for (int j = y; j < y + h; j++)
-			{
-				set(i, j, clr);
-			}
-		}
-	}
+    boolean yGood = y >= 0 && y < this.getHeight();
 
-	//seems to be the best implementation
-	void stackFill(int x, int y, int clr)
-	{
-		LinkedList<Point> stack = new LinkedList<Point>();
+    return xGood && yGood;
+  }
 
-		stack.push(new Point(x,y));
-
-		Point pixel = null;
-
-		while(!stack.isEmpty())
-		{
-			pixel = stack.pop();
-
-			if (inBounds(pixel) && get(pixel.x, pixel.y) != clr)
-			{
-				//set this pixel
-				set(pixel.x, pixel.y, clr);
-
-				//then push its neighbors
-				stack.push(new Point(pixel.x + 1, pixel.y));
-				stack.push(new Point(pixel.x - 1, pixel.y));
-				stack.push(new Point(pixel.x, pixel.y + 1));
-				stack.push(new Point(pixel.x, pixel.y - 1));
-
-			}
-		}
-	}
-
-	boolean inBounds (Point p)
-	{
-		return inBounds(p.x, p.y);
-	}
-
-	boolean inBounds (int x, int y)
-	{
-		boolean xGood = x >= 0 && x < this.getWidth();
-
-		boolean yGood = y >= 0 && y < this.getHeight();
-
-		return xGood && yGood;
-	}
-
-	void drawRect(int origX, int origY, int width, int height, int clr)
-	{
-		drawRectOutline(origX, origY, width, height, clr);
-
-		stackFill(origX + 1, origY + 2, clr);
-	}
-
-	void drawRect(int origX, int origY, int width, int height, Color clr)
-	{
-		drawRect(origX, origY, width, height, clr.getRGB());
-	}
-
-	//draws a hollow rectangle and returns the (x,y) point of the NW corner of the inner rect
-	Point drawHollowRect(int origX, int origY, int outerW, int outerH, int innerW, int innerH, int clr)
-	{
-		//a hollow rectangle is made up of two rectangular outlines
-
-		//first draw the outer rectangle
-		drawRectOutline(origX, origY, outerW, outerH, clr);
-
-		//now find the origin for the inner rect
-		int innerXOrig = origX + innerW;
-		int innerYOrig = origY + innerH;
-
-    //TODO fix centering
-		drawRectOutline(innerXOrig, innerXOrig, outerW - innerW, outerH - innerH, clr);
+  Point drawRect(int origX, int origY, int width, int height, int clr)
+  {
+    drawRectOutline(origX, origY, width, height, clr);
 
     stackFill(origX + 1, origY + 2, clr);
 
-		Point innerOrig = new Point(innerXOrig, innerYOrig);
+    return new Point(origX, origY);
+  }
 
-		return innerOrig;
-	}
+  Point drawRect(int origX, int origY, int width, int height, Color clr)
+  {
+    return drawRect(origX, origY, width, height, clr.getRGB());
+  }
+
+  //draws a hollow rectangle and returns the (x,y) point of the NW corner of the inner rect
+  Point drawHollowRect(int origX, int origY, int outerW, int outerH, int innerW, int innerH, int clr)
+  {
+    //a hollow rectangle is made up of two rectangular outlines
+
+    //first draw the outer rectangle
+    drawRectOutline(origX, origY, outerW, outerH, clr);
+
+    Point innerPoint = getConcentric(origX, origY, outerW, outerH, innerW, innerH);
+
+    int iPx = innerPoint.x;
+
+    int iPy = innerPoint.y;
+
+    drawRectOutline(iPx, iPy, innerW, innerH, clr);
+
+    stackFill(origX + 1, origY + 2, clr);
+
+    //Point innerOrig = new Point(innerXOrig, innerYOrig);
+
+    return innerPoint;
+  }
 
   Point drawHollowRect(int origX, int origY, int outerW, int outerH, int innerW, int innerH, Color clr)
   {
     return drawHollowRect(origX, origY, outerW, outerH, innerW, innerH, clr.getRGB());
+  }
+
+  //gets the NW point of an inner rectangle concentric to an outer rectangle
+  Point getConcentric (int origX, int origY, int ow, int oh, int iw, int ih)
+  {
+    int newX = origX + ((ow - iw)/2);
+
+    int newY = origY + ((oh - ih)/2);
+
+    return new Point (newX, newY);
   }
 
 }

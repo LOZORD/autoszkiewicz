@@ -16,5 +16,6 @@ hs_err_pid*
 *.png
 *.bmp
 *.gif
+*.tiff
 
 .metadata/

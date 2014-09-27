@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import java.awt.Point;
 import java.io.*;
 import java.util.LinkedList;
+import java.util.HashSet;
 
 import javax.imageio.*;
 
@@ -131,7 +132,9 @@ public class AutoImg extends BufferedImage
 
   void stackFill(int x, int y, int clr)
   {
+
     LinkedList<Point> stack = new LinkedList<Point>();
+    HashSet<Point> alreadySetPts = new HashSet<Point>();
 
     stack.push(new Point(x,y));
 
@@ -141,10 +144,14 @@ public class AutoImg extends BufferedImage
     {
       pixel = stack.pop();
 
-      if (inBounds(pixel) && get(pixel.x, pixel.y) != clr)
+      if (inBounds(pixel)
+        && (get(pixel.x, pixel.y) != clr)
+        && !alreadySetPts.contains(pixel) )
       {
         //set this pixel
         set(pixel.x, pixel.y, clr);
+
+        alreadySetPts.add(pixel);
 
         //then push its neighbors
         stack.push(new Point(pixel.x + 1, pixel.y));

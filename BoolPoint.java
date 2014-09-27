@@ -24,4 +24,9 @@ class BoolPoint extends Point
   {
     return this.isSet;
   }
+
+  public Point toPoint ()
+  {
+    return new Point(this.x, this.y);
+  }
 }

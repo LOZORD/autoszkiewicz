@@ -6,14 +6,7 @@ public class Test5
 {
   public static void main (String [] args)
   {
-
-    /*
-      FIXME
-      There is a weird out of heap space error coming from this!
-      Even when the dimensions are small, it still happens.
-    */
-
-    int dim = 64;
+    int dim = 512;
 
     AutoImg myImg = new AutoImg(dim, dim);
 
@@ -31,10 +24,9 @@ public class Test5
 
     int s = colors.length;
     
-    //FIXME
-    //p = myImg.drawHollowRect(oA, oB, thickness, colors[0]);
+    p = myImg.drawHollowRect(oA, oB, thickness, colors[0]);
 
-    //p = myImg.drawRect(oA, oB, c);
+    p = myImg.drawRect(oA, oB, c);
 
     p = myImg.drawRect(dim/4, dim/4, dim/2, dim/2, c);
 

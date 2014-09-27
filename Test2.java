@@ -3,27 +3,28 @@ import java.awt.color.*;
 
 class Test2
 {
-	public static void main (String [] args)
-	{
-		int dim = 512;
-		
-		AutoImg myImg = new AutoImg(dim, dim);
-		
-		
-		//first draw a diagonal line
-		for(int a = 0; a < dim; a++)
-		{
-			myImg.set(a,a, Color.red);
-		}
+  public static void main (String [] args)
+  {
+    System.out.println("Draw a diagonal red line going " +
+      "through at centered solid white square");
+    int dim = 512;
 
-		//then draw a square
+    AutoImg myImg = new AutoImg(dim, dim);
 
-		myImg.drawRect(dim/4, dim/4, dim/2, dim/2, Color.white);
+    //first draw a diagonal line
+    for(int a = 0; a < dim; a++)
+    {
+      myImg.set(a,a, Color.red);
+    }
 
-		//myImg.write("test2.bmp", "bmp");
+    //then draw a square
 
-		myImg.write("white_and_red.bmp");
+    myImg.drawRect(dim/4, dim/4, dim/2, dim/2, Color.white);
 
-		System.out.println("Written!");
-	}
+    //myImg.write("test2.bmp", "bmp");
+
+    myImg.write("white_and_red.bmp");
+
+    System.out.println("Written!");
+  }
 }

@@ -6,10 +6,11 @@ class Test3
 {
   public static void main (String [] args)
   {
+    System.out.println("Concentric blue and white squares with red diagonal");
+
     int dim = 1024;
 
     AutoImg myImg = new AutoImg(dim, dim);
-
 
     //first draw a diagonal line
     for(int a = 0; a < dim; a++)
